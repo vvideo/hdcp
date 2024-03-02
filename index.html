@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Detect HDCP</title>
+  <meta charset="utf-8" />
+  <style>
+    html, body {
+        padding: 0;
+        margin: 0;
+        border: 0;
+        background: black;
+        color: white;
+    }
+
+    .page {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 30px;
+    }
+
+    .content {
+        font-size: 40px;
+    }
+  </style>
+</head>
+<body>
+    <div class="page">
+        <div class="content">HDCP version: <span id="version">...</span></div>
+    </div>
+    <script type="module">
+        import { getHdcpVersion } from 'https://unpkg.com/hdcp/dist/index.esm.js';
+
+        getHdcpVersion().then((result) => {
+            const elem = document.getElementById('version');
+            elem.innerText = result ? result.max : 'not supported';
+
+            console.log('getHdcpVersion(): ', result);
+        });
+    </script>
+</body>
+</html>

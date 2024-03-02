@@ -1,0 +1,43 @@
+{
+    "name": "hdcp",
+    "version": "0.1.0",
+    "description": "Detect HDCP version in browser",
+    "type": "module",
+    "main": "./dist/index.common.js",
+    "module": "./dist/index.esm.js",
+    "types": "./dist/index.d.ts",
+    "engines": {
+      "node": ">=12"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/vvideo/detect-hdcp.git"
+    },
+    "scripts": {
+      "clean": "del ./dist/*",
+      "test": "tsc --noEmit",
+      "build": "npm run clean && rollup --config rollup.config.mjs",
+      "prepare": "npm run build"
+    },
+    "files": [
+      "dist",
+      "LICENSE",
+      "README.md"
+    ],
+    "author": {
+      "name": "Denis Seleznev",
+      "email": "hcodes@yandex.ru",
+      "url": "https://github.com/vvideo/detect-hdcp"
+    },
+    "keywords": [
+      "hdcp"
+    ],
+    "license": "MIT",
+    "devDependencies": {
+        "@rollup/plugin-typescript": "^11.1.6",
+        "del-cli": "^5.1.0",
+        "rollup": "^4.12.0",
+        "tslib": "2.6.2",
+        "typescript": "^5.3.3"
+    }
+  }
