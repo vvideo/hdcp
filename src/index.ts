@@ -11,7 +11,12 @@ export const hdcpVersions = [
     '2.3',
 ];
 
-export function isHdcpVersionSupported(keySystem: string, hdcpVersion: string): Promise<boolean> {
+interface CheckHdcpVersion {
+    version: string;
+    status: string;
+}
+
+export function checkHdcp(keySystem: string): Promise<CheckHdcpVersion[]> {
     const config = [{
         videoCapabilities: [{
             contentType: 'video/mp4; codecs="avc1.42E01E"',
@@ -22,45 +27,22 @@ export function isHdcpVersionSupported(keySystem: string, hdcpVersion: string): 
         .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
         .then(mediaKeys => {
             if (!('getStatusForPolicy' in mediaKeys)) {
-                return false;
+                const error = Error('Method getStatusForPolicy is not supported');
+                error.name = 'NotSupportedError';
+                throw error;
             }
 
-            // @ts-ignore
-            return mediaKeys.getStatusForPolicy({ minHdcpVersion: hdcpVersion });
-        })
-        .then(status => status === 'usable')
-        .catch(() => false);
-}
+            const promises: Promise<CheckHdcpVersion>[] = [];
+            hdcpVersions.forEach(minHdcpVersion => {
+                promises.push(
+                    // @ts-ignore
+                    mediaKeys.getStatusForPolicy({ minHdcpVersion }).then(status => ({
+                        version: minHdcpVersion,
+                        status,
+                    }))
+                );
+            });
 
-interface HdcpVersion {
-    min: string;
-    max: string;
-}
-
-export function getHdcpVersion(): Promise<HdcpVersion | null> {
-    const promises: Promise<boolean>[]= [];
-
-    hdcpVersions.forEach(version => {
-        promises.push(isHdcpVersionSupported('com.widevine.alpha', version));
-    });
-
-    return Promise.all(promises).then(result => {
-        let min = '';
-        let max = '';
-
-        result.forEach((supported, i) => {
-            if (supported) {
-                if (!min) {
-                    min = hdcpVersions[i];
-                }
-
-                max = hdcpVersions[i];
-            }
+            return Promise.all(promises);
         });
-
-        return min ? {
-            min,
-            max,
-        } : null;
-    });
 }
