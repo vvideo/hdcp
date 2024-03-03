@@ -30,7 +30,7 @@
         <div class="content">HDCP version: <span id="version">...</span></div>
     </div>
     <script type="module">
-        import { getHdcpVersion } from './dist/index.esm.js';
+        import { checkHdcp } from './dist/index.esm.js';
 
         checkHdcp('com.widevine.alpha')
             .then((result) => console.log('com.widevine.alpha'. result))
