@@ -35,6 +35,14 @@
         checkHdcp('com.widevine.alpha')
             .then((result) => console.log('com.widevine.alpha', result))
             .catch((e) => console.error('com.widevine.alpha', e));
-    </script>
+
+        checkHdcp('com.microsoft.playready')
+            .then((result) => console.log('com.microsoft.playready', result))
+            .catch((e) => console.error('com.microsoft.playready', e));
+
+        checkHdcp('com.apple.fps')
+            .then((result) => console.log('com.apple.fps', result))
+            .catch((e) => console.error('com.apple.fps', e));
+</script>
 </body>
 </html>
