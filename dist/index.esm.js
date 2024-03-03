@@ -10,7 +10,7 @@ const hdcpVersions = [
     '2.2',
     '2.3',
 ];
-function isHdcpVersionSupported(keySystem, hdcpVersion) {
+function checkHdcp(keySystem) {
     const config = [{
             videoCapabilities: [{
                     contentType: 'video/mp4; codecs="avc1.42E01E"',
@@ -20,35 +20,21 @@ function isHdcpVersionSupported(keySystem, hdcpVersion) {
         .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
         .then(mediaKeys => {
         if (!('getStatusForPolicy' in mediaKeys)) {
-            return false;
+            const error = Error('Method getStatusForPolicy is not supported');
+            error.name = 'NotSupportedError';
+            throw error;
         }
-        // @ts-ignore
-        return mediaKeys.getStatusForPolicy({ minHdcpVersion: hdcpVersion });
-    })
-        .then(status => status === 'usable')
-        .catch(() => false);
-}
-function getHdcpVersion() {
-    const promises = [];
-    hdcpVersions.forEach(version => {
-        promises.push(isHdcpVersionSupported('com.widevine.alpha', version));
-    });
-    return Promise.all(promises).then(result => {
-        let min = '';
-        let max = '';
-        result.forEach((supported, i) => {
-            if (supported) {
-                if (!min) {
-                    min = hdcpVersions[i];
-                }
-                max = hdcpVersions[i];
-            }
+        const promises = [];
+        hdcpVersions.forEach(minHdcpVersion => {
+            promises.push(
+            // @ts-ignore
+            mediaKeys.getStatusForPolicy({ minHdcpVersion }).then(status => ({
+                version: minHdcpVersion,
+                status,
+            })));
         });
-        return min ? {
-            min,
-            max,
-        } : null;
+        return Promise.all(promises);
     });
 }
 
-export { getHdcpVersion, hdcpVersions, isHdcpVersionSupported };
+export { checkHdcp, hdcpVersions };

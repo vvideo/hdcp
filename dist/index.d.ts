@@ -1,8 +1,7 @@
 export declare const hdcpVersions: string[];
-export declare function isHdcpVersionSupported(keySystem: string, hdcpVersion: string): Promise<boolean>;
-interface HdcpVersion {
-    min: string;
-    max: string;
+interface CheckHdcpVersion {
+    version: string;
+    status: string;
 }
-export declare function getHdcpVersion(): Promise<HdcpVersion | null>;
+export declare function checkHdcp(keySystem: string): Promise<CheckHdcpVersion[]>;
 export {};
