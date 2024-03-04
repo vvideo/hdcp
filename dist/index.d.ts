@@ -1,7 +1,8 @@
 export declare const hdcpVersions: string[];
+export declare function checkHdcpVersion(keySystem: string, version: string): Promise<MediaKeyStatus>;
 interface CheckHdcpVersion {
     version: string;
-    status: string;
+    status: MediaKeyStatus;
 }
-export declare function checkHdcp(keySystem: string): Promise<CheckHdcpVersion[]>;
+export declare function checkAllHdcpVersions(keySystem: string): Promise<CheckHdcpVersion[]>;
 export {};
