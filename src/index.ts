@@ -1,4 +1,5 @@
 // https://wicg.github.io/hdcp-detection/
+
 export const hdcpVersions = [
     '1.0',
     '1.1',
@@ -7,23 +8,39 @@ export const hdcpVersions = [
     '1.4',
     '2.0',
     '2.1',
-    '2.2',
+    '2.2', // Ultra HD 4K
     '2.3',
 ];
 
-interface CheckHdcpVersion {
-    version: string;
-    status: string;
+const defaultConfig = [{
+    videoCapabilities: [{
+        contentType: 'video/mp4; codecs="avc1.42E01E"',
+    }],
+}];
+
+
+export function checkHdcpVersion(keySystem: string, version: string): Promise<MediaKeyStatus> {
+    return navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
+        .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
+        .then(mediaKeys => {
+            if (!('getStatusForPolicy' in mediaKeys)) {
+                const error = Error('Method getStatusForPolicy is not supported');
+                error.name = 'NotSupportedError';
+                throw error;
+            }
+
+            // @ts-ignore
+            return mediaKeys.getStatusForPolicy({ minHdcpVersion: version });
+        });
 }
 
-export function checkHdcp(keySystem: string): Promise<CheckHdcpVersion[]> {
-    const config = [{
-        videoCapabilities: [{
-            contentType: 'video/mp4; codecs="avc1.42E01E"',
-        }],
-    }];
+interface CheckHdcpVersion {
+    version: string;
+    status: MediaKeyStatus;
+}
 
-    return navigator.requestMediaKeySystemAccess(keySystem, config)
+export function checkAllHdcpVersions(keySystem: string): Promise<CheckHdcpVersion[]> {
+    return navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
         .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
         .then(mediaKeys => {
             if (!('getStatusForPolicy' in mediaKeys)) {
