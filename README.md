@@ -2,6 +2,8 @@
 
 Detect HDCP version for key system in browser.
 
+[Demo](https://vvideo.github.io/hdcp/index.html)
+
 ## Install
 `npm i --save-dev hdcp`
 
