@@ -1,6 +1,6 @@
 {
     "name": "hdcp",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "description": "Detect HDCP version in browser",
     "type": "module",
     "main": "./dist/index.common.js",
@@ -11,7 +11,7 @@
     },
     "repository": {
       "type": "git",
-      "url": "git://github.com/vvideo/detect-hdcp.git"
+      "url": "git://github.com/vvideo/hdcp.git"
     },
     "scripts": {
       "clean": "del ./dist/*",
@@ -27,7 +27,7 @@
     "author": {
       "name": "Denis Seleznev",
       "email": "hcodes@yandex.ru",
-      "url": "https://github.com/vvideo/detect-hdcp"
+      "url": "https://github.com/vvideo/hdcp"
     },
     "keywords": [
       "hdcp"
