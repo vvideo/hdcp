@@ -71,7 +71,7 @@
                 console.log(result);
             })
             .catch((error) => {
-                widevineElem.innerText = error;
+                playreadyElem.innerText = error;
                 console.error(error);
             });
 
@@ -80,7 +80,7 @@
                 fairplayElem.innerText = JSON.stringify(result, ' ', 4);
                 console.log(result);
             })
-            .catch((e) => {
+            .catch((error) => {
                 fairplayElem.innerText = error;
                 console.error(error);
             });
