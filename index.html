@@ -13,36 +13,77 @@
     }
 
     .page {
-        position: fixed;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+        margin: 50px;
         font-size: 30px;
     }
 
-    .content {
-        font-size: 40px;
+    h1 {
+        margin: 0;
+        padding: 0;
+    }
+
+    .keysystem {
+        margin-top: 10px;
+        line-height: 2em;
+    }
+
+    .keysytem-result {
+        text-wrap: pre;
     }
   </style>
 </head>
 <body>
     <div class="page">
-        <div class="content">HDCP version: <span id="version">...</span></div>
+        <h1>HDCP versions by key system</h1>
+        <div class="keysystem">
+            <div class="keysystem-label">Google Widevine</div>
+            <div class="keysytem-result" id="widevine-result"></div>
+        </div>
+        <div class="keysystem">
+            <div class="keysystem-label">Microsoft PlayReady</div>
+            <div class="keysytem-result" id="playready-result"></div>
+        </div>
+        <div class="keysystem">
+            <div class="keysystem-label">Apple FairPlay</div>
+            <div class="keysytem-result" id="fairplay-result"></div>
+        </div>
     </div>
     <script type="module">
-        import { checkHdcp } from './dist/index.esm.js';
+        import { checkAllHdcpVersions } from './dist/index.esm.js';
+
+        const widevineElem = document.querySelector('#widevine-result');
+        const playReadyElem = document.querySelector('#playready-result');
+        const fairplayElem = document.querySelector('#fairplay-result');
 
         checkHdcp('com.widevine.alpha')
-            .then((result) => console.log('com.widevine.alpha', result))
-            .catch((e) => console.error('com.widevine.alpha', e));
+            .then((result) => {
+                widevineElem.innerText = JSON.stringify(result, ' ', 4);
+                console.log(result);
+            })
+            .catch((error) => {
+                widevineElem.innerText = error;
+                console.error(error);
+            });
 
         checkHdcp('com.microsoft.playready')
-            .then((result) => console.log('com.microsoft.playready', result))
-            .catch((e) => console.error('com.microsoft.playready', e));
+            .then((result) => {
+                playreadyElem.innerText = JSON.stringify(result, ' ', 4);
+                console.log(result);
+            })
+            .catch((error) => {
+                widevineElem.innerText = error;
+                console.error(error);
+            });
 
         checkHdcp('com.apple.fps')
-            .then((result) => console.log('com.apple.fps', result))
-            .catch((e) => console.error('com.apple.fps', e));
+            .then((result) => {
+                fairplayElem.innerText = JSON.stringify(result, ' ', 4);
+                console.log(result);
+            })
+            .catch((e) => {
+                fairplayElem.innerText = error;
+                console.error(error);
+            });
 </script>
 </body>
 </html>
