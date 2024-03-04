@@ -55,7 +55,7 @@
         const playReadyElem = document.querySelector('#playready-result');
         const fairplayElem = document.querySelector('#fairplay-result');
 
-        checkHdcp('com.widevine.alpha')
+        checkAllHdcpVersions('com.widevine.alpha')
             .then((result) => {
                 widevineElem.innerText = JSON.stringify(result, ' ', 4);
                 console.log(result);
@@ -65,7 +65,7 @@
                 console.error(error);
             });
 
-        checkHdcp('com.microsoft.playready')
+        checkAllHdcpVersions('com.microsoft.playready')
             .then((result) => {
                 playreadyElem.innerText = JSON.stringify(result, ' ', 4);
                 console.log(result);
@@ -75,7 +75,7 @@
                 console.error(error);
             });
 
-        checkHdcp('com.apple.fps')
+        checkAllHdcpVersions('com.apple.fps')
             .then((result) => {
                 fairplayElem.innerText = JSON.stringify(result, ' ', 4);
                 console.log(result);
