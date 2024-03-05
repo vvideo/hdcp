@@ -55,7 +55,7 @@
         function prepareResult(data) {
             const html = [];
             data.forEach((item) => {
-                let line = item.value + ': ' + item.status;
+                let line = item.version + ': ' + item.status;
                 if (item.status === 'usable') {
                     line = '<b>' + line + '</b>';
                 }
