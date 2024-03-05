@@ -3,7 +3,7 @@
 [![NPM downloads](https://img.shields.io/npm/dm/hdcp.svg?style=flat)](https://www.npmjs.com/package/hdcp)
 [![install size](https://packagephobia.com/badge?p=hdcp)](https://packagephobia.com/result?p=hdcp)
 
-Detect HDCP version for key system in browser.
+Check HDCP version for key system in browser.
 
 [Demo](https://vvideo.github.io/hdcp/index.html)
 
