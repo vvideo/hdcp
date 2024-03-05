@@ -19,4 +19,4 @@ console.log('checkAllHdcpVersions: ', result);
 ```
 
 ## Links
-- https://wicg.github.io/hdcp-detection/
+- [Encrypted Media: HDCP Policy Check](https://wicg.github.io/hdcp-detection/)
