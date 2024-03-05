@@ -1,4 +1,7 @@
 # HDCP
+[![NPM version](https://img.shields.io/npm/v/hdcp.svg?style=flat)](https://www.npmjs.com/package/hdcp)
+[![NPM downloads](https://img.shields.io/npm/dm/hdcp.svg?style=flat)](https://www.npmjs.com/package/hdcp)
+[![install size](https://packagephobia.com/badge?p=hdcp)](https://packagephobia.com/result?p=hdcp)
 
 Detect HDCP version for key system in browser.
 
