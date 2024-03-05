@@ -52,9 +52,23 @@
         const playreadyElem = document.querySelector('#playready-result');
         const fairplayElem = document.querySelector('#fairplay-result');
 
+        function prepareResult(data) {
+            const html = [];
+            data.forEach((item) => {
+                let line = item.value + ': ' + item.status;
+                if (item.status === 'usable') {
+                    item.push('<b>' + line + '</b>');
+                }
+
+                html.push(line);
+            });
+
+            return html.join('<br/>');
+        }
+
         checkAllHdcpVersions('com.widevine.alpha')
             .then((result) => {
-                widevineElem.innerText = JSON.stringify(result, null, '    ');
+                widevineElem.innerHTML = prepareResult(result);
                 console.log(result);
             })
             .catch((error) => {
@@ -64,7 +78,7 @@
 
         checkAllHdcpVersions('com.microsoft.playready')
             .then((result) => {
-                playreadyElem.innerText = JSON.stringify(result, null, '    ');
+                playreadyElem.innerHTML = prepareResult(result);
                 console.log(result);
             })
             .catch((error) => {
@@ -74,7 +88,7 @@
 
         checkAllHdcpVersions('com.apple.fps')
             .then((result) => {
-                fairplayElem.innerText = JSON.stringify(result, null, '    ');
+                fairplayElem.innerHTML = prepareResult(result);
                 console.log(result);
             })
             .catch((error) => {
