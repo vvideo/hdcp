@@ -57,7 +57,7 @@
             data.forEach((item) => {
                 let line = item.value + ': ' + item.status;
                 if (item.status === 'usable') {
-                    item.push('<b>' + line + '</b>');
+                    line = '<b>' + line + '</b>';
                 }
 
                 html.push(line);
