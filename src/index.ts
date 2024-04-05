@@ -34,7 +34,7 @@ export function checkHdcpVersion(keySystem: string, version: string): Promise<Me
         });
 }
 
-interface CheckHdcpVersion {
+export interface CheckHdcpVersion {
     version: string;
     status: MediaKeyStatus;
 }
