@@ -1,6 +1,6 @@
 {
     "name": "hdcp",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Detect HDCP version in browser",
     "type": "module",
     "main": "./dist/index.common.js",
