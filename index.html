@@ -37,7 +37,7 @@
             <div class="keysytem-result" id="widevine-result"></div>
         </div>
         <div class="keysystem">
-            <div class="keysystem-label">com.microsoft.playready</div>
+            <div class="keysystem-label">com.microsoft.playready.recommendation</div>
             <div class="keysytem-result" id="playready-result"></div>
         </div>
         <div class="keysystem">
@@ -76,7 +76,7 @@
                 console.error(error);
             });
 
-        checkAllHdcpVersions('com.microsoft.playready')
+        checkAllHdcpVersions('com.microsoft.playready.recommendation')
             .then((result) => {
                 playreadyElem.innerHTML = prepareResult(result);
                 console.log(result);
