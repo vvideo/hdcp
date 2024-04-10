@@ -27,23 +27,31 @@
         margin-top: 10px;
         line-height: 1.7em;
     }
+
+    .keysystem-label {
+        font-weight: bold;
+    }
   </style>
 </head>
 <body>
     <div class="page">
         <h1>Check HDCP versions</h1>
-        <div class="keysystem">
-            <div class="keysystem-label">com.widevine.alpha</div>
-            <div class="keysytem-result" id="widevine-result"></div>
-        </div>
-        <div class="keysystem">
-            <div class="keysystem-label">com.microsoft.playready.recommendation</div>
-            <div class="keysytem-result" id="playready-result"></div>
-        </div>
-        <div class="keysystem">
-            <div class="keysystem-label">com.apple.fps</div>
-            <div class="keysytem-result" id="fairplay-result"></div>
-        </div>
+
+        Key systems:
+        <ul>
+            <li class="keysystem">
+                <div class="keysystem-label">com.widevine.alpha</div>
+                <div class="keysytem-result" id="widevine-result"></div>
+            </li>
+            <li class="keysystem">
+                <div class="keysystem-label">com.microsoft.playready.recommendation</div>
+                <div class="keysytem-result" id="playready-result"></div>
+            </li>
+            <li class="keysystem">
+                <div class="keysystem-label">com.apple.fps</div>
+                <div class="keysytem-result" id="fairplay-result"></div>
+            </li>
+        </ul>
     </div>
     <script type="module">
         import { checkAllHdcpVersions } from './dist/index.esm.js';
