@@ -1,6 +1,6 @@
 {
     "name": "hdcp",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Detect HDCP version in browser",
     "type": "module",
     "main": "./dist/index.common.js",
@@ -15,7 +15,8 @@
     },
     "scripts": {
       "clean": "del ./dist/*",
-      "test": "tsc --noEmit",
+      "test": "npm run typecheck",
+      "typecheck": "tsc --noEmit",
       "build": "npm run clean && rollup --config rollup.config.mjs",
       "prepare": "npm run build"
     },
