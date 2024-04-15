@@ -17,7 +17,7 @@ import { checkHdcpVersion, checkAllHdcpVersions } from 'hdcp';
 const status = await checkHdcpVersion('com.widevine.alpha', '1.0');
 console.log('checkHdcpVersion: ', status);
 
-const result = await checkAllHdcpVersions('com.microsoft.playready');
+const result = await checkAllHdcpVersions('com.microsoft.playready.recommendation');
 console.log('checkAllHdcpVersions: ', result);
 ```
 
