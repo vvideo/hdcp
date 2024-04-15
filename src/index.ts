@@ -18,9 +18,14 @@ const defaultConfig = [{
     }],
 }];
 
-
 export function checkHdcpVersion(keySystem: string, version: string): Promise<MediaKeyStatus> {
-    return navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
+    if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
+        const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
+        error.name = 'NotSupportedError';
+        return Promise.reject(error);    
+    }
+
+    return window.navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
         .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
         .then(mediaKeys => {
             if (!('getStatusForPolicy' in mediaKeys)) {
@@ -40,7 +45,13 @@ export interface CheckHdcpVersion {
 }
 
 export function checkAllHdcpVersions(keySystem: string): Promise<CheckHdcpVersion[]> {
-    return navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
+    if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
+        const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
+        error.name = 'NotSupportedError';
+        return Promise.reject(error);    
+    }
+
+    return window.navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
         .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
         .then(mediaKeys => {
             if (!('getStatusForPolicy' in mediaKeys)) {
