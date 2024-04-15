@@ -16,7 +16,12 @@ const defaultConfig = [{
             }],
     }];
 function checkHdcpVersion(keySystem, version) {
-    return navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
+    if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
+        const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
+        error.name = 'NotSupportedError';
+        return Promise.reject(error);
+    }
+    return window.navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
         .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
         .then(mediaKeys => {
         if (!('getStatusForPolicy' in mediaKeys)) {
@@ -29,7 +34,12 @@ function checkHdcpVersion(keySystem, version) {
     });
 }
 function checkAllHdcpVersions(keySystem) {
-    return navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
+    if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
+        const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
+        error.name = 'NotSupportedError';
+        return Promise.reject(error);
+    }
+    return window.navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
         .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
         .then(mediaKeys => {
         if (!('getStatusForPolicy' in mediaKeys)) {
