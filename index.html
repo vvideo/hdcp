@@ -74,7 +74,9 @@
                 html.push(line);
             });
 
-            html.push(isUhdHdcpSupported(data) ? '✅ without restrictions for UHD (4K)' : '');
+            if (isUhdHdcpSupported(data)) {
+                html.push('✅ without restrictions for UHD (4K)');
+            }
 
             return html.join('<br/>');
         }
