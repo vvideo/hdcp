@@ -1,3 +1,8 @@
+# 1.1.0
+Added helpers:
+- getMaxHdcpVersion
+- isUhdHdcpSupported
+
 # 1.0.2
 Fix for older browser, navigator.requestMediaKeySystemAccess is undefined.
 

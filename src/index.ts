@@ -12,6 +12,27 @@ export const hdcpVersions = [
     '2.3',
 ];
 
+export const HDCP_MIN_VERSION_WITH_UHD = '2.2';
+
+export function getMaxHdcpVersion(versions: CheckHdcpVersion[]) {
+    for (let i = versions.length - 1; i >= 0; i--) {
+        const item = versions[i];
+        if (item.status === 'usable') {
+            return item.version;
+        }
+    }
+
+    return '';
+}
+
+export function isUhdHdcpSupported(versions: CheckHdcpVersion[]) {
+    const maxVersion = getMaxHdcpVersion(versions);
+
+    return maxVersion ?
+        parseFloat(maxVersion) >= parseFloat(HDCP_MIN_VERSION_WITH_UHD) :
+        false;
+}
+
 const defaultConfig = [{
     videoCapabilities: [{
         contentType: 'video/mp4; codecs="avc1.42E01E"',
