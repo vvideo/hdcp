@@ -62,10 +62,6 @@
     <script type="module">
         import { checkAllHdcpVersions } from './dist/index.esm.js';
 
-        const widevineElem = document.querySelector('#widevine-result');
-        const playreadyElem = document.querySelector('#playready-result');
-        const fairplayElem = document.querySelector('#fairplay-result');
-
         function prepareResult(data) {
             const html = [];
             data.forEach((item) => {
@@ -80,35 +76,30 @@
             return html.join('<br/>');
         }
 
-        checkAllHdcpVersions('com.widevine.alpha')
-            .then((result) => {
-                widevineElem.innerHTML = prepareResult(result);
-                console.log(result);
+        [
+          {
+            keySystem: 'com.widevine.alpha'',
+            elem: document.querySelector('#widevine-result')
+          },
+          {
+            keySystem: 'com.microsoft.playready.recommendation',
+            elem: document.querySelector('#playready-result'),
+          },
+          {
+            keySystem: 'com.apple.fps',
+            elem: document.querySelector('#fairplay-result');
+          }
+        ].forEach(item => {
+          checkAllHdcpVersions(item.keySystem)
+            .then(result => {
+                item.elem.innerHTML = prepareResult(result);
+                console.log(result);              
             })
-            .catch((error) => {
-                widevineElem.innerText = '⚠️ ' + error;
+            .catch(error => {
+                item.elem.innerText = '⚠️ ' + error;
                 console.error(error);
             });
-
-        checkAllHdcpVersions('com.microsoft.playready.recommendation')
-            .then((result) => {
-                playreadyElem.innerHTML = prepareResult(result);
-                console.log(result);
-            })
-            .catch((error) => {
-                playreadyElem.innerText = '⚠️ ' + error;
-                console.error(error);
-            });
-
-        checkAllHdcpVersions('com.apple.fps')
-            .then((result) => {
-                fairplayElem.innerHTML = prepareResult(result);
-                console.log(result);
-            })
-            .catch((error) => {
-                fairplayElem.innerText = '⚠️ ' + error;
-                console.error(error);
-            });
+        });
 </script>
 </body>
 </html>
