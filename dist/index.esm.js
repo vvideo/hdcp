@@ -10,6 +10,22 @@ const hdcpVersions = [
     '2.2', // Ultra HD 4K
     '2.3',
 ];
+const HDCP_MIN_VERSION_WITH_UHD = '2.2';
+function getMaxHdcpVersion(versions) {
+    for (let i = versions.length - 1; i >= 0; i--) {
+        const item = versions[i];
+        if (item.status === 'usable') {
+            return item.version;
+        }
+    }
+    return '';
+}
+function isUhdHdcpSupported(versions) {
+    const maxVersion = getMaxHdcpVersion(versions);
+    return maxVersion ?
+        parseFloat(maxVersion) >= parseFloat(HDCP_MIN_VERSION_WITH_UHD) :
+        false;
+}
 const defaultConfig = [{
         videoCapabilities: [{
                 contentType: 'video/mp4; codecs="avc1.42E01E"',
@@ -60,4 +76,4 @@ function checkAllHdcpVersions(keySystem) {
     });
 }
 
-export { checkAllHdcpVersions, checkHdcpVersion, hdcpVersions };
+export { HDCP_MIN_VERSION_WITH_UHD, checkAllHdcpVersions, checkHdcpVersion, getMaxHdcpVersion, hdcpVersions, isUhdHdcpSupported };
