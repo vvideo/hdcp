@@ -83,11 +83,11 @@
           },
           {
             keySystem: 'com.microsoft.playready.recommendation',
-            elem: document.querySelector('#playready-result'),
+            elem: document.querySelector('#playready-result')
           },
           {
             keySystem: 'com.apple.fps',
-            elem: document.querySelector('#fairplay-result');
+            elem: document.querySelector('#fairplay-result')
           }
         ].forEach(item => {
           checkAllHdcpVersions(item.keySystem)
