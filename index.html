@@ -15,17 +15,34 @@
         font-size: 16px;
     }
 
+    a:link, a:visited, a:hover, a:active {
+        color: lightblue;
+    }
+
     .page {
         margin: 30px;
     }
 
     h1 {
-        margin: 0 0 1em 0;
+        margin: 1em 0 .3em 0;
         padding: 0;
         font-size: 25px;
+        font-weight: bold;
     }
 
-    .keysystems {
+    h2 {
+        margin: 1em 0 .3em 0;
+        padding: 0;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+    }
+    
+    li {
         margin: 0.5em 0 0 1em;
         padding: 0;
     }
@@ -42,9 +59,9 @@
 </head>
 <body>
     <div class="page">
-        <h1>Check HDCP versions</h1>
+        <h1>Check HDCP support in your browser</h1>
 
-        Key systems:
+       <h2>DRM key systems</h2>
         <ul class="keysystems">
             <li class="keysystem">
                 <div class="keysystem-label">com.widevine.alpha</div>
@@ -59,9 +76,15 @@
                 <div class="keysytem-result" id="fairplay-result"></div>
             </li>
         </ul>
+
+        <h2>Links</h2>
+        <ul>
+            <li><a target="_blank" href="https://en.wikipedia.org/wiki/High-bandwidth_Digital_Content_Protection">Wikipedia: HDCP</a></li>
+            <li><a target="_blank" href="https://www.digital-cp.com/hdcp-specifications">HDCP Specifications</a></li>
+        </ul>
     </div>
     <script type="module">
-        import { checkAllHdcpVersions, isUhdHdcpSupported } from './dist/index.esm.js';
+        import { checkAllHdcpVersions } from './dist/index.esm.js';
 
         function prepareResult(data) {
             const html = [];
@@ -73,10 +96,6 @@
 
                 html.push(line);
             });
-
-            if (isUhdHdcpSupported(data)) {
-                html.push('✅ without restrictions for UHD (4K)');
-            }
 
             return html.join('<br/>');
         }
