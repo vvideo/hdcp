@@ -91,7 +91,7 @@
             data.forEach((item) => {
                 let line = item.version + ': ' + item.status;
                 if (item.status === 'usable') {
-                    line = '<b>' + line + '</b>';
+                    line = '<b>' + line + ' ✅</b>';
                 }
 
                 html.push(line);
