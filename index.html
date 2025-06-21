@@ -89,7 +89,7 @@
         function prepareResult(data) {
             const html = [];
             data.forEach((item) => {
-                let line = item.version + ': ' + item.status;
+                let line = 'HDCP ' + item.version + ': ' + item.status;
                 if (item.status === 'usable') {
                     line = '<b>' + line + ' ✅</b>';
                 }
