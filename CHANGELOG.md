@@ -1,3 +1,9 @@
+# 2.0.0
+- Added `findMaxHdcpVersion()` function to quickly find maximum supported HDCP version.
+- Replaced `HDCP_MIN_VERSION_WITH_UHD` with `HDCP_MIN_VERSION_WITH_4K`.
+- Added `HDCP_MIN_VERSION_WITH_8K` const.
+- Added `is8KHdcpSupported()` helper.
+
 # 1.1.0
 Added helpers:
 - getMaxHdcpVersion
