@@ -26,4 +26,6 @@ console.log('HDCP version: ', data.version);
 ```
 
 ## Links
+- [Wikipedia: HDCP](https://en.wikipedia.org/wiki/High-bandwidth_Digital_Content_Protection)
+- [HDCP Specifications](https://www.digital-cp.com/hdcp-specifications)
 - [Encrypted Media: HDCP Policy Check](https://w3c.github.io/encrypted-media/#dom-mediakeys-getstatusforpolicy)
