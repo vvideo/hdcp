@@ -20,7 +20,8 @@ console.log('checkHdcpVersion: ', status);
 const allVersions = await checkAllHdcpVersions('com.microsoft.playready.recommendation');
 console.log('checkAllHdcpVersions: ', allVersions);
 
-// More efficient (binary) search for supported HDCP version if full status for all HDCP versions is not needed.
+// More efficient (binary) search for supported HDCP version
+// if full status for all HDCP versions is not needed.
 const data = findMaxHdcpVersion('com.widevine.alpha');
 console.log('HDCP version: ', data.version);
 ```
