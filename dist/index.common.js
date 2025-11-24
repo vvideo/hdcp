@@ -1,6 +1,6 @@
 'use strict';
 
-// https://wicg.github.io/hdcp-detection/
+// https://w3c.github.io/encrypted-media/#dom-mediakeys-getstatusforpolicy
 const hdcpVersions = [
     '1.0',
     '1.1',
@@ -12,34 +12,37 @@ const hdcpVersions = [
     '2.2', // 4K
     '2.3', // 8K
 ];
-const HDCP_MIN_VERSION_WITH_4K = '2.2';
-const HDCP_MIN_VERSION_WITH_8K = '2.3';
-function getMaxHdcpVersion(versions) {
-    for (let i = versions.length - 1; i >= 0; i--) {
-        const item = versions[i];
-        if (item.status === 'usable') {
-            return item.version;
-        }
-    }
-    return '';
-}
-function is4KHdcpSupported(versions) {
-    const maxVersion = getMaxHdcpVersion(versions);
-    return maxVersion ?
-        parseFloat(maxVersion) >= parseFloat(HDCP_MIN_VERSION_WITH_4K) :
-        false;
-}
-function is8KHdcpSupported(versions) {
-    const maxVersion = getMaxHdcpVersion(versions);
-    return maxVersion ?
-        parseFloat(maxVersion) >= parseFloat(HDCP_MIN_VERSION_WITH_8K) :
-        false;
-}
 const defaultConfig = [{
         videoCapabilities: [{
                 contentType: 'video/mp4; codecs="avc1.42E01E"',
             }],
     }];
+const HDCP_MIN_VERSION_WITH_4K = '2.2';
+const HDCP_MIN_VERSION_WITH_8K = '2.3';
+function isUsableStatus(status) {
+    return status === 'usable';
+}
+function getMaxHdcpVersion(versions) {
+    for (let i = versions.length - 1; i >= 0; i--) {
+        const item = versions[i];
+        if (isUsableStatus(item.status)) {
+            return item.version;
+        }
+    }
+    return '';
+}
+function is4KHdcpSupported(version) {
+    const maxVersion = Array.isArray(version) ? getMaxHdcpVersion(version) : version;
+    return maxVersion ?
+        parseFloat(maxVersion) >= parseFloat(HDCP_MIN_VERSION_WITH_4K) :
+        false;
+}
+function is8KHdcpSupported(version) {
+    const maxVersion = Array.isArray(version) ? getMaxHdcpVersion(version) : version;
+    return maxVersion ?
+        parseFloat(maxVersion) >= parseFloat(HDCP_MIN_VERSION_WITH_8K) :
+        false;
+}
 function checkHdcpVersion(keySystem, version) {
     if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
         const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
@@ -96,27 +99,41 @@ async function findMaxHdcpVersion(keySystem) {
     }
     let left = 0;
     let right = hdcpVersions.length - 1;
-    let maxSupportedVersion = '';
-    const maxVersion = hdcpVersions[right];
-    const maxStatus = await mediaKeys.getStatusForPolicy({ minHdcpVersion: maxVersion });
-    if (maxStatus === 'usable') {
-        return maxVersion;
+    let version = hdcpVersions[right];
+    let status = await mediaKeys.getStatusForPolicy({ minHdcpVersion: version });
+    const attempts = [{
+            version,
+            status,
+        }];
+    if (isUsableStatus(status)) {
+        return {
+            version,
+            status,
+            attempts,
+        };
     }
     while (left <= right) {
         const middle = Math.floor((left + right) / 2);
-        const middleVersion = hdcpVersions[middle];
-        const midStatus = await mediaKeys.getStatusForPolicy({ minHdcpVersion: middleVersion });
-        if (midStatus === 'usable') {
-            // Если текущая версия поддерживается, сохраняем её и ищем более высокую
-            maxSupportedVersion = middleVersion;
+        version = hdcpVersions[middle];
+        status = await mediaKeys.getStatusForPolicy({ minHdcpVersion: version });
+        attempts.push({
+            version,
+            status,
+        });
+        if (isUsableStatus(status)) {
             left = middle + 1;
         }
         else {
-            // Если текущая версия не поддерживается, ищем более низкую
             right = middle - 1;
         }
     }
-    return maxSupportedVersion;
+    attempts.sort((a, b) => parseFloat(a.version) - parseFloat(b.version));
+    const maxVersion = getMaxHdcpVersion(attempts);
+    return {
+        version: maxVersion,
+        status: maxVersion ? 'usable' : attempts[0].status,
+        attempts,
+    };
 }
 
 exports.HDCP_MIN_VERSION_WITH_4K = HDCP_MIN_VERSION_WITH_4K;
@@ -128,3 +145,4 @@ exports.getMaxHdcpVersion = getMaxHdcpVersion;
 exports.hdcpVersions = hdcpVersions;
 exports.is4KHdcpSupported = is4KHdcpSupported;
 exports.is8KHdcpSupported = is8KHdcpSupported;
+exports.isUsableStatus = isUsableStatus;

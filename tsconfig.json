@@ -99,6 +99,7 @@
     },
     "exclude": [
       "./test/**/*",
+      "jest.config.ts",
       "./dist/**/*"
     ]
   }

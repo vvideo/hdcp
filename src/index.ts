@@ -1,4 +1,9 @@
-// https://wicg.github.io/hdcp-detection/
+// https://w3c.github.io/encrypted-media/#dom-mediakeys-getstatusforpolicy
+
+export interface CheckHdcpVersion {
+    version: string;
+    status: MediaKeyStatus;
+}
 
 export const hdcpVersions = [
     '1.0',
@@ -12,13 +17,23 @@ export const hdcpVersions = [
     '2.3', // 8K
 ];
 
+const defaultConfig = [{
+    videoCapabilities: [{
+        contentType: 'video/mp4; codecs="avc1.42E01E"',
+    }],
+}];
+
 export const HDCP_MIN_VERSION_WITH_4K = '2.2';
 export const HDCP_MIN_VERSION_WITH_8K = '2.3';
 
-export function getMaxHdcpVersion(versions: CheckHdcpVersion[]) {
+export function isUsableStatus(status: MediaKeyStatus) {
+    return status === 'usable';
+}
+
+export function getMaxHdcpVersion(versions: CheckHdcpVersion[]): string {
     for (let i = versions.length - 1; i >= 0; i--) {
         const item = versions[i];
-        if (item.status === 'usable') {
+        if (isUsableStatus(item.status)) {
             return item.version;
         }
     }
@@ -26,33 +41,27 @@ export function getMaxHdcpVersion(versions: CheckHdcpVersion[]) {
     return '';
 }
 
-export function is4KHdcpSupported(versions: CheckHdcpVersion[]) {
-    const maxVersion = getMaxHdcpVersion(versions);
+export function is4KHdcpSupported(version: string | CheckHdcpVersion[]): boolean {
+    const maxVersion = Array.isArray(version) ? getMaxHdcpVersion(version) : version;
 
     return maxVersion ?
         parseFloat(maxVersion) >= parseFloat(HDCP_MIN_VERSION_WITH_4K) :
         false;
 }
 
-export function is8KHdcpSupported(versions: CheckHdcpVersion[]) {
-    const maxVersion = getMaxHdcpVersion(versions);
+export function is8KHdcpSupported(version: string | CheckHdcpVersion[]): boolean {
+    const maxVersion = Array.isArray(version) ? getMaxHdcpVersion(version) : version;
 
     return maxVersion ?
         parseFloat(maxVersion) >= parseFloat(HDCP_MIN_VERSION_WITH_8K) :
         false;
 }
 
-const defaultConfig = [{
-    videoCapabilities: [{
-        contentType: 'video/mp4; codecs="avc1.42E01E"',
-    }],
-}];
-
 export function checkHdcpVersion(keySystem: string, version: string): Promise<MediaKeyStatus> {
     if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
         const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
         error.name = 'NotSupportedError';
-        return Promise.reject(error);    
+        return Promise.reject(error);
     }
 
     return window.navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
@@ -68,16 +77,11 @@ export function checkHdcpVersion(keySystem: string, version: string): Promise<Me
         });
 }
 
-export interface CheckHdcpVersion {
-    version: string;
-    status: MediaKeyStatus;
-}
-
 export function checkAllHdcpVersions(keySystem: string): Promise<CheckHdcpVersion[]> {
     if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
         const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
         error.name = 'NotSupportedError';
-        return Promise.reject(error);    
+        return Promise.reject(error);
     }
 
     return window.navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
@@ -103,11 +107,11 @@ export function checkAllHdcpVersions(keySystem: string): Promise<CheckHdcpVersio
         });
 }
 
-export async function findMaxHdcpVersion(keySystem: string): Promise<string> {
+export async function findMaxHdcpVersion(keySystem: string): Promise<{ version: string; status: MediaKeyStatus; attempts: CheckHdcpVersion[]; }> {
     if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
         const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
         error.name = 'NotSupportedError';
-        return Promise.reject(error);    
+        return Promise.reject(error);
     }
 
     const mediaKeys = await window.navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
@@ -121,30 +125,44 @@ export async function findMaxHdcpVersion(keySystem: string): Promise<string> {
 
     let left = 0;
     let right = hdcpVersions.length - 1;
-    let maxSupportedVersion = '';
+    let version = hdcpVersions[right];
+    let status = await mediaKeys.getStatusForPolicy({ minHdcpVersion: version });
+    const attempts: CheckHdcpVersion[] = [{
+        version,
+        status,
+    }];
 
-    const maxVersion = hdcpVersions[right];
-    const maxStatus = await mediaKeys.getStatusForPolicy({ minHdcpVersion: maxVersion });
-    
-    if (maxStatus === 'usable') {
-        return maxVersion;
+    if (isUsableStatus(status)) {
+        return {
+            version,
+            status,
+            attempts,
+        };
     }
 
     while (left <= right) {
         const middle = Math.floor((left + right) / 2);
-        const middleVersion = hdcpVersions[middle];
-        
-        const midStatus = await mediaKeys.getStatusForPolicy({ minHdcpVersion: middleVersion });
+        version = hdcpVersions[middle];
+        status = await mediaKeys.getStatusForPolicy({ minHdcpVersion: version });
+        attempts.push({
+            version,
+            status,
+        });
 
-        if (midStatus === 'usable') {
-            // Если текущая версия поддерживается, сохраняем её и ищем более высокую
-            maxSupportedVersion = middleVersion;
+        if (isUsableStatus(status)) {
             left = middle + 1;
         } else {
-            // Если текущая версия не поддерживается, ищем более низкую
             right = middle - 1;
         }
     }
 
-    return maxSupportedVersion;
+    attempts.sort((a, b) => parseFloat(a.version) - parseFloat(b.version));
+
+    const maxVersion = getMaxHdcpVersion(attempts);
+
+    return {
+        version: maxVersion,
+        status: maxVersion ? 'usable' : attempts[0].status,
+        attempts,
+    };
 }
