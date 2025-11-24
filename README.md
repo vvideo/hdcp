@@ -12,7 +12,7 @@ Check HDCP version for key system in browser.
 
 ## Using
 ```js
-import { checkHdcpVersion, checkAllHdcpVersions } from 'hdcp';
+import { checkHdcpVersion, checkAllHdcpVersions, findMaxHdcpVersion } from 'hdcp';
 
 const status = await checkHdcpVersion('com.widevine.alpha', '1.0');
 console.log('checkHdcpVersion: ', status);

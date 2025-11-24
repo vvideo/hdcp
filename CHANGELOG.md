@@ -1,3 +1,6 @@
+# 2.0.2
+Updated README.md for npmjs.com.
+
 # 2.0.1
 Fixes for `findMaxHdcpVersion()`.
 
