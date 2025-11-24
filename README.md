@@ -17,9 +17,13 @@ import { checkHdcpVersion, checkAllHdcpVersions } from 'hdcp';
 const status = await checkHdcpVersion('com.widevine.alpha', '1.0');
 console.log('checkHdcpVersion: ', status);
 
-const result = await checkAllHdcpVersions('com.microsoft.playready.recommendation');
-console.log('checkAllHdcpVersions: ', result);
+const allVersions = await checkAllHdcpVersions('com.microsoft.playready.recommendation');
+console.log('checkAllHdcpVersions: ', allVersions);
+
+// More efficient (binary) search for supported HDCP version if full status for all HDCP versions is not needed.
+const data = findMaxHdcpVersion('com.widevine.alpha');
+console.log('HDCP version: ', data.version);
 ```
 
 ## Links
-- [Encrypted Media: HDCP Policy Check](https://wicg.github.io/hdcp-detection/)
+- [Encrypted Media: HDCP Policy Check](https://w3c.github.io/encrypted-media/#dom-mediakeys-getstatusforpolicy)
