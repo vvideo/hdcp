@@ -15,7 +15,7 @@
   },
   "scripts": {
     "clean": "del ./dist/*",
-    "test": "jest . && ts --noEmit",
+    "test": "jest . && tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "build": "npm run clean && rollup --config rollup.config.mjs",
     "prepare": "npm run build"
