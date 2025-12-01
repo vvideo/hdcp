@@ -1,3 +1,6 @@
+# 3.0.0
+Removed `findMaxHdcpVersion()` function, HDCP versions may be supported with gaps.
+
 # 2.0.2
 Updated README.md for npmjs.com.
 

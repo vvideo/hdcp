@@ -6,7 +6,6 @@ import {
     is8KHdcpSupported,
     checkHdcpVersion,
     checkAllHdcpVersions,
-    findMaxHdcpVersion,
     isUsableStatus
 } from '../src/index';
 
@@ -247,98 +246,5 @@ describe('checkAllHdcpVersions', () => {
                 minHdcpVersion: version
             });
         });
-    });
-});
-
-describe('findMaxHdcpVersion', () => {
-    it('should reject when requestMediaKeySystemAccess is not supported', async () => {
-        // @ts-ignore
-        delete window.navigator.requestMediaKeySystemAccess;
-
-        await expect(findMaxHdcpVersion('com.widevine.alpha'))
-            .rejects
-            .toMatchObject({
-                name: 'NotSupportedError',
-                message: 'navigator.requestMediaKeySystemAccess is not supported'
-            });
-    });
-
-    it('should reject when getStatusForPolicy is not supported', async () => {
-        const mockMediaKeys = {};
-        const mockMediaKeySystemAccess = {
-            createMediaKeys: jest.fn().mockResolvedValue(mockMediaKeys),
-        };
-
-        mockRequestMediaKeySystemAccess.mockResolvedValue(mockMediaKeySystemAccess);
-
-        await expect(findMaxHdcpVersion('com.widevine.alpha'))
-            .rejects
-            .toMatchObject({
-                name: 'NotSupportedError',
-                message: 'Method getStatusForPolicy is not supported'
-            });
-    });
-
-    it('should return highest usable version with binary search', async () => {
-        const mockMediaKeys = {
-            getStatusForPolicy: jest.fn()
-                // 2.3
-                .mockResolvedValueOnce('expired')
-                // 1.4
-                .mockResolvedValueOnce('usable')
-                // 2.1
-                .mockResolvedValueOnce('usable')
-                // 2.2
-                .mockResolvedValueOnce('expired')
-        };
-        const mockMediaKeySystemAccess = {
-            createMediaKeys: jest.fn().mockResolvedValue(mockMediaKeys),
-        };
-
-        mockRequestMediaKeySystemAccess.mockResolvedValue(mockMediaKeySystemAccess);
-
-        const result = await findMaxHdcpVersion('com.widevine.alpha');
-
-        expect(result.version).toBe('2.1');
-        expect(result.status).toBe('usable');
-        expect(result.attempts).toHaveLength(4);
-        expect(mockMediaKeys.getStatusForPolicy).toHaveBeenCalledTimes(4);
-    });
-
-    it('should return empty version when no usable versions found', async () => {
-        const mockMediaKeys = {
-            getStatusForPolicy: jest.fn()
-                .mockResolvedValue('expired'),
-        };
-        const mockMediaKeySystemAccess = {
-            createMediaKeys: jest.fn().mockResolvedValue(mockMediaKeys),
-        };
-
-        mockRequestMediaKeySystemAccess.mockResolvedValue(mockMediaKeySystemAccess);
-
-        const result = await findMaxHdcpVersion('com.widevine.alpha');
-
-        expect(result.version).toBe('');
-        expect(result.status).toBe('expired');
-        expect(result.attempts.length).toBe(4);
-    });
-
-    it('should return immediately when highest version is usable', async () => {
-        const mockMediaKeys = {
-            getStatusForPolicy: jest.fn()
-                .mockResolvedValue('usable'),
-        };
-        const mockMediaKeySystemAccess = {
-            createMediaKeys: jest.fn().mockResolvedValue(mockMediaKeys),
-        };
-
-        mockRequestMediaKeySystemAccess.mockResolvedValue(mockMediaKeySystemAccess);
-
-        const result = await findMaxHdcpVersion('com.widevine.alpha');
-
-        expect(result.version).toBe('2.3');
-        expect(result.status).toBe('usable');
-        expect(result.attempts).toHaveLength(1);
-        expect(mockMediaKeys.getStatusForPolicy).toHaveBeenCalledTimes(1);
     });
 });
