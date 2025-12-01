@@ -11,8 +11,3 @@ export declare function is4KHdcpSupported(version: string | CheckHdcpVersion[]):
 export declare function is8KHdcpSupported(version: string | CheckHdcpVersion[]): boolean;
 export declare function checkHdcpVersion(keySystem: string, version: string): Promise<MediaKeyStatus>;
 export declare function checkAllHdcpVersions(keySystem: string): Promise<CheckHdcpVersion[]>;
-export declare function findMaxHdcpVersion(keySystem: string): Promise<{
-    version: string;
-    status: MediaKeyStatus;
-    attempts: CheckHdcpVersion[];
-}>;
