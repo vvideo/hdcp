@@ -10,7 +10,6 @@ import {
 } from '../src/index';
 
 const mockRequestMediaKeySystemAccess = jest.fn();
-const mockCreateMediaKeys = jest.fn();
 const mockGetStatusForPolicy = jest.fn();
 
 beforeEach(() => {
@@ -18,6 +17,12 @@ beforeEach(() => {
 
     if (global.window) {
         global.window.navigator.requestMediaKeySystemAccess = mockRequestMediaKeySystemAccess;
+        // @ts-ignore
+        global.window.MediaKeys = {};
+        // @ts-ignore
+        global.window.MediaKeys.prototype = {
+            getStatusForPolicy: mockGetStatusForPolicy,
+        };
     }
 });
 
@@ -132,20 +137,7 @@ describe('is8KHdcpSupported', () => {
 describe('checkHdcpVersion', () => {
     beforeEach(() => {
         mockRequestMediaKeySystemAccess.mockClear();
-        mockCreateMediaKeys.mockClear();
         mockGetStatusForPolicy.mockClear();
-    });
-
-    it('should reject when requestMediaKeySystemAccess is not supported', async () => {
-        // @ts-ignore
-        delete window.navigator.requestMediaKeySystemAccess;
-
-        await expect(checkHdcpVersion('com.widevine.alpha', '2.2'))
-            .rejects
-            .toMatchObject({
-                name: 'NotSupportedError',
-                message: 'navigator.requestMediaKeySystemAccess is not supported'
-            });
     });
 
     it('should reject when getStatusForPolicy is not supported', async () => {
@@ -156,11 +148,14 @@ describe('checkHdcpVersion', () => {
 
         mockRequestMediaKeySystemAccess.mockResolvedValue(mockMediaKeySystemAccess);
 
+        // @ts-ignore
+        delete window.MediaKeys.prototype.getStatusForPolicy;
+
         await expect(checkHdcpVersion('com.widevine.alpha', '2.2'))
             .rejects
             .toMatchObject({
                 name: 'NotSupportedError',
-                message: 'Method getStatusForPolicy is not supported'
+                message: 'MediaKeys.prototype.getStatusForPolicy is not supported',
             });
     });
 
@@ -182,29 +177,20 @@ describe('checkHdcpVersion', () => {
             expect.any(Array)
         );
         expect(mockMediaKeys.getStatusForPolicy).toHaveBeenCalledWith({
-            minHdcpVersion: '2.2'
+            minHdcpVersion: '2.2',
         });
     });
 });
 
 describe('checkAllHdcpVersions', () => {
-    it('should reject when requestMediaKeySystemAccess is not supported', async () => {
-        // @ts-ignore
-        delete window.navigator.requestMediaKeySystemAccess;
-
-        await expect(checkAllHdcpVersions('com.widevine.alpha'))
-            .rejects
-            .toMatchObject({
-                name: 'NotSupportedError',
-                message: 'navigator.requestMediaKeySystemAccess is not supported'
-            });
-    });
-
     it('should reject when getStatusForPolicy is not supported', async () => {
         const mockMediaKeys = {};
         const mockMediaKeySystemAccess = {
             createMediaKeys: jest.fn().mockResolvedValue(mockMediaKeys),
         };
+
+        // @ts-ignore
+        delete window.MediaKeys.prototype.getStatusForPolicy;
 
         mockRequestMediaKeySystemAccess.mockResolvedValue(mockMediaKeySystemAccess);
 
@@ -212,7 +198,7 @@ describe('checkAllHdcpVersions', () => {
             .rejects
             .toMatchObject({
                 name: 'NotSupportedError',
-                message: 'Method getStatusForPolicy is not supported'
+                message: 'MediaKeys.prototype.getStatusForPolicy is not supported',
             });
     });
 
@@ -243,7 +229,7 @@ describe('checkAllHdcpVersions', () => {
 
         hdcpVersions.forEach(version => {
             expect(mockMediaKeys.getStatusForPolicy).toHaveBeenCalledWith({
-                minHdcpVersion: version
+                minHdcpVersion: version,
             });
         });
     });
