@@ -1,3 +1,6 @@
+# 3.1.0
+Added extra HDCP version detection check for Safari.
+
 # 3.0.0
 Removed `findMaxHdcpVersion()` function, HDCP versions may be supported with gaps.
 
