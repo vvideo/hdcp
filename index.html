@@ -1,90 +1,112 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Check HDCP versions</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width" />
-  <style>
-    html, body {
-        padding: 0;
-        margin: 0;
-        border: 0;
-        background: black;
-        color: white;
-        font-family: Arial, sans-serif;
-        font-size: 16px;
-    }
+    <title>Check HDCP versions</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            border: 0;
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+        }
 
-    a:link, a:visited, a:hover, a:active {
-        color: lightblue;
-    }
+        a:link,
+        a:visited,
+        a:hover,
+        a:active {
+            color: lightblue;
+        }
 
-    .page {
-        margin: 30px;
-    }
+        .page {
+            margin: 30px;
+        }
 
-    h1 {
-        margin: 1em 0 .3em 0;
-        padding: 0;
-        font-size: 25px;
-        font-weight: bold;
-    }
+        h1 {
+            margin: 1em 0 .3em 0;
+            padding: 0;
+            font-size: 25px;
+            font-weight: bold;
+        }
 
-    h2 {
-        margin: 1em 0 .3em 0;
-        padding: 0;
-        font-size: 20px;
-        font-weight: bold;
-    }
+        h2 {
+            margin: 1em 0 .3em 0;
+            padding: 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
 
-    ul {
-        margin: 0;
-        padding: 0;
-    }
-    
-    li {
-        margin: 0.5em 0 0 1em;
-        padding: 0;
-    }
+        ul {
+            margin: 0;
+            padding: 0;
+        }
 
-    .keysystem {
-        margin-top: 10px;
-        line-height: 1.7em;
-    }
+        li {
+            margin: 0.5em 0 0 1em;
+            padding: 0;
+        }
 
-    .keysystem-label {
-        font-weight: bold;
-    }
-  </style>
+        .keysystem {
+            margin-top: 10px;
+            line-height: 1.7em;
+        }
+
+        .keysystem-label {
+            font-weight: bold;
+        }
+
+        .no-support {
+            font-weight: bold;
+            color: red;
+            display: none;
+        }
+
+        .drm-key-systems {
+            display: none;
+        }
+    </style>
 </head>
+
 <body>
     <div class="page">
         <h1>Check HDCP support in your browser</h1>
 
-       <h2>DRM key systems</h2>
-        <ul class="keysystems">
-            <li class="keysystem">
-                <div class="keysystem-label">com.widevine.alpha</div>
-                <div class="keysytem-result" id="widevine-result"></div>
-            </li>
-            <li class="keysystem">
-                <div class="keysystem-label">com.microsoft.playready.recommendation</div>
-                <div class="keysytem-result" id="playready-result"></div>
-            </li>
-            <li class="keysystem">
-                <div class="keysystem-label">com.apple.fps</div>
-                <div class="keysytem-result" id="fairplay-result"></div>
-            </li>
-        </ul>
+        <div class="no-support">❌ Your browser does not support HDCP version detection.</div>
+        <div class="drm-key-systems">
+            <h2>DRM key systems</h2>
+            <ul class="keysystems">
+                <li class="keysystem">
+                    <div class="keysystem-label">com.widevine.alpha</div>
+                    <div class="keysytem-result" id="widevine-result"></div>
+                </li>
+                <li class="keysystem">
+                    <div class="keysystem-label">com.microsoft.playready.recommendation</div>
+                    <div class="keysytem-result" id="playready-result"></div>
+                </li>
+            </ul>
+        </div>
 
         <h2>Links</h2>
         <ul>
-            <li><a target="_blank" href="https://en.wikipedia.org/wiki/High-bandwidth_Digital_Content_Protection">Wikipedia: HDCP</a></li>
-            <li><a target="_blank" href="https://www.digital-cp.com/hdcp-specifications">HDCP Specifications</a></li>
+            <li>
+                <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/MediaKeys/getStatusForPolicy#browser_compatibility">MDN: browser compatibility</a>
+            </li>
+            <li>
+                <a target="_blank" href="https://en.wikipedia.org/wiki/High-bandwidth_Digital_Content_Protection">Wikipedia: HDCP</a>
+            </li>
+            <li>
+                <a target="_blank" href="https://www.digital-cp.com/hdcp-specifications">HDCP Specifications</a>
+            </li>
         </ul>
     </div>
     <script type="module">
-        import { checkAllHdcpVersions } from './dist/index.esm.js';
+        import { canDetectHdcpVersion, checkAllHdcpVersions } from './dist/index.esm.js';
 
         function prepareResult(data) {
             const html = [];
@@ -100,30 +122,46 @@
             return html.join('<br/>');
         }
 
-        [
-          {
-            keySystem: 'com.widevine.alpha',
-            elem: document.querySelector('#widevine-result')
-          },
-          {
-            keySystem: 'com.microsoft.playready.recommendation',
-            elem: document.querySelector('#playready-result')
-          },
-          {
-            keySystem: 'com.apple.fps',
-            elem: document.querySelector('#fairplay-result')
-          }
-        ].forEach(item => {
-          checkAllHdcpVersions(item.keySystem)
-            .then(result => {
-                item.elem.innerHTML = prepareResult(result);
-                console.log(result);              
-            })
-            .catch(error => {
-                item.elem.innerText = '⚠️ ' + error;
-                console.error(error);
+        function showElement(elem) {
+            if (elem) {
+                elem.style.display = 'block';
+            }
+        }
+
+        function detectHdcpVersion() {
+            if (!canDetectHdcpVersion()) {
+                const errorElement = document.querySelector('.no-support');
+                showElement(errorElement);
+                return;
+            }
+
+            const drmKeySystemsElement = document.querySelector('.drm-key-systems');
+            showElement(drmKeySystemsElement);
+
+            [
+                {
+                    keySystem: 'com.widevine.alpha',
+                    elem: document.querySelector('#widevine-result')
+                },
+                {
+                    keySystem: 'com.microsoft.playready.recommendation',
+                    elem: document.querySelector('#playready-result')
+                },
+            ].forEach(item => {
+                checkAllHdcpVersions(item.keySystem)
+                    .then(result => {
+                        item.elem.innerHTML = prepareResult(result);
+                        console.log(result);
+                    })
+                    .catch(error => {
+                        item.elem.innerText = '⚠️ ' + error;
+                        console.error(error);
+                    });
             });
-        });
-</script>
+        }
+
+        detectHdcpVersion();
+    </script>
 </body>
+
 </html>

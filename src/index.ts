@@ -26,6 +26,13 @@ const defaultConfig = [{
 export const HDCP_MIN_VERSION_WITH_4K = '2.2';
 export const HDCP_MIN_VERSION_WITH_8K = '2.3';
 
+export function canDetectHdcpVersion() {
+    return Boolean(
+        window.MediaKeys &&
+        typeof window.MediaKeys.prototype.getStatusForPolicy === 'function'
+    );
+}
+
 export function isUsableStatus(status: MediaKeyStatus) {
     return status === 'usable';
 }
@@ -58,41 +65,27 @@ export function is8KHdcpSupported(version: string | CheckHdcpVersion[]): boolean
 }
 
 export function checkHdcpVersion(keySystem: string, version: string): Promise<MediaKeyStatus> {
-    if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
-        const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
+    if (!canDetectHdcpVersion()) {
+        const error = new Error('MediaKeys.prototype.getStatusForPolicy is not supported');
         error.name = 'NotSupportedError';
         return Promise.reject(error);
     }
 
-    return window.navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
+    return navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
         .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
-        .then(mediaKeys => {
-            if (!('getStatusForPolicy' in mediaKeys)) {
-                const error = Error('Method getStatusForPolicy is not supported');
-                error.name = 'NotSupportedError';
-                throw error;
-            }
-
-            return mediaKeys.getStatusForPolicy({ minHdcpVersion: version });
-        });
+        .then(mediaKeys => mediaKeys.getStatusForPolicy({ minHdcpVersion: version }));
 }
 
 export function checkAllHdcpVersions(keySystem: string): Promise<CheckHdcpVersion[]> {
-    if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
-        const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
+    if (!canDetectHdcpVersion()) {
+        const error = new Error('MediaKeys.prototype.getStatusForPolicy is not supported');
         error.name = 'NotSupportedError';
         return Promise.reject(error);
     }
 
-    return window.navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
+    return navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
         .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
         .then(mediaKeys => {
-            if (!('getStatusForPolicy' in mediaKeys)) {
-                const error = Error('Method getStatusForPolicy is not supported');
-                error.name = 'NotSupportedError';
-                throw error;
-            }
-
             const promises: Promise<CheckHdcpVersion>[] = [];
             hdcpVersions.forEach(minHdcpVersion => {
                 promises.push(
