@@ -5,6 +5,7 @@ export interface CheckHdcpVersion {
 export declare const hdcpVersions: string[];
 export declare const HDCP_MIN_VERSION_WITH_4K = "2.2";
 export declare const HDCP_MIN_VERSION_WITH_8K = "2.3";
+export declare function canDetectHdcpVersion(): boolean;
 export declare function isUsableStatus(status: MediaKeyStatus): status is "usable";
 export declare function getMaxHdcpVersion(versions: CheckHdcpVersion[]): string;
 export declare function is4KHdcpSupported(version: string | CheckHdcpVersion[]): boolean;

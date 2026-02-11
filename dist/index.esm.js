@@ -17,6 +17,10 @@ const defaultConfig = [{
     }];
 const HDCP_MIN_VERSION_WITH_4K = '2.2';
 const HDCP_MIN_VERSION_WITH_8K = '2.3';
+function canDetectHdcpVersion() {
+    return Boolean(window.MediaKeys &&
+        typeof window.MediaKeys.prototype.getStatusForPolicy === 'function');
+}
 function isUsableStatus(status) {
     return status === 'usable';
 }
@@ -42,36 +46,24 @@ function is8KHdcpSupported(version) {
         false;
 }
 function checkHdcpVersion(keySystem, version) {
-    if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
-        const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
+    if (!canDetectHdcpVersion()) {
+        const error = new Error('MediaKeys.prototype.getStatusForPolicy is not supported');
         error.name = 'NotSupportedError';
         return Promise.reject(error);
     }
-    return window.navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
+    return navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
         .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
-        .then(mediaKeys => {
-        if (!('getStatusForPolicy' in mediaKeys)) {
-            const error = Error('Method getStatusForPolicy is not supported');
-            error.name = 'NotSupportedError';
-            throw error;
-        }
-        return mediaKeys.getStatusForPolicy({ minHdcpVersion: version });
-    });
+        .then(mediaKeys => mediaKeys.getStatusForPolicy({ minHdcpVersion: version }));
 }
 function checkAllHdcpVersions(keySystem) {
-    if (typeof window.navigator.requestMediaKeySystemAccess !== 'function') {
-        const error = new Error('navigator.requestMediaKeySystemAccess is not supported');
+    if (!canDetectHdcpVersion()) {
+        const error = new Error('MediaKeys.prototype.getStatusForPolicy is not supported');
         error.name = 'NotSupportedError';
         return Promise.reject(error);
     }
-    return window.navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
+    return navigator.requestMediaKeySystemAccess(keySystem, defaultConfig)
         .then(mediaKeySystemAccess => mediaKeySystemAccess.createMediaKeys())
         .then(mediaKeys => {
-        if (!('getStatusForPolicy' in mediaKeys)) {
-            const error = Error('Method getStatusForPolicy is not supported');
-            error.name = 'NotSupportedError';
-            throw error;
-        }
         const promises = [];
         hdcpVersions.forEach(minHdcpVersion => {
             promises.push(mediaKeys.getStatusForPolicy({ minHdcpVersion }).then(status => ({
@@ -83,4 +75,4 @@ function checkAllHdcpVersions(keySystem) {
     });
 }
 
-export { HDCP_MIN_VERSION_WITH_4K, HDCP_MIN_VERSION_WITH_8K, checkAllHdcpVersions, checkHdcpVersion, getMaxHdcpVersion, hdcpVersions, is4KHdcpSupported, is8KHdcpSupported, isUsableStatus };
+export { HDCP_MIN_VERSION_WITH_4K, HDCP_MIN_VERSION_WITH_8K, canDetectHdcpVersion, checkAllHdcpVersions, checkHdcpVersion, getMaxHdcpVersion, hdcpVersions, is4KHdcpSupported, is8KHdcpSupported, isUsableStatus };
